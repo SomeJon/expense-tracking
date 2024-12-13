@@ -1,25 +1,38 @@
 import React from 'react';
-import { Card, CardHeader, CardContent, List, ListItem, ListItemText, IconButton } from '@mui/material';
+import { Card, CardContent, List, ListItem, ListItemText, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 
-const ExpenseList = ({ expenses, onDeleteExpense }) => {
+const ExpenseList = ({ expenses, onDeleteExpense, onEditExpense }) => {
   return (
-    <Card style={{ marginBottom: '1rem' }}>
-      <CardHeader title="רשימת הוצאות" />
+    <Card>
       <CardContent>
         <List>
           {expenses.map((expense) => (
             <ListItem
               key={expense.id}
               style={{
-                backgroundColor: expense.amount > 0 ? '#d4edda' : '#f8d7da', // Green for positive, red for negative
-                marginBottom: '0.5rem',
+                backgroundColor: expense.category === 'תוספת תקציב' ? '#d4edda' : '#f8d7da',
+                marginBottom: '8px',
                 borderRadius: '4px',
               }}
               secondaryAction={
-                <IconButton edge="end" aria-label="delete" onClick={() => onDeleteExpense(expense.id)}>
-                  <DeleteIcon />
-                </IconButton>
+                <>
+                  <IconButton
+                    edge="end"
+                    aria-label="edit"
+                    onClick={() => onEditExpense(expense.id, { /* Provide edit data logic here */ })}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton
+                    edge="end"
+                    aria-label="delete"
+                    onClick={() => onDeleteExpense(expense.id)}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </>
               }
             >
               <ListItemText

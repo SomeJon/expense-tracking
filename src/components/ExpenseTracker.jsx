@@ -4,7 +4,6 @@ import ExpenseList from './ExpenseList';
 import Summary from './Summary';
 import CategoryChart from './CategoryChart';
 import BudgetForm from './BudgetForm';
-import { Card } from '@mui/material';
 
 const STORAGE_KEY = 'expense-tracker-data';
 
@@ -60,7 +59,16 @@ const ExpenseTracker = () => {
   };
 
   const deleteExpense = (id) => {
-    setExpenses(expenses.filter((expense) => expense.id !== id));
+    const expenseToDelete = expenses.find((expense) => expense.id === id);
+
+    // Check if the deleted expense is a budget addition
+    if (expenseToDelete?.category === 'תוספת תקציב') {
+      setMonthlyBudget((prevBudget) => prevBudget - expenseToDelete.amount);
+    }
+
+    // Remove the expense from the list
+    setExpenses((prevExpenses) => prevExpenses.filter((expense) => expense.id !== id));
+    console.log('ההוצאה נמחקה בהצלחה');
   };
 
   const editExpense = (id, updatedData) => {
@@ -71,7 +79,12 @@ const ExpenseTracker = () => {
     );
   };
 
-  const getTotalExpenses = () => expenses.reduce((sum, expense) => sum + expense.amount, 0);
+  const getTotalExpenses = () =>
+    expenses.reduce(
+      (sum, expense) =>
+        expense.category !== 'תוספת תקציב' ? sum + expense.amount : sum,
+      0
+    );
 
   const getRemainingBudget = () => monthlyBudget - getTotalExpenses();
 
@@ -83,10 +96,15 @@ const ExpenseTracker = () => {
       <BudgetForm onAddBudget={addBudget} />
       <Summary
         monthlyBudget={monthlyBudget}
-        totalExpenses={getTotalExpenses()}
+        totalExpenses={getTotalExpenses()} // Excludes budget additions
         remainingBudget={getRemainingBudget()}
       />
-      <CategoryChart expenses={expenses} categories={categories} />
+      <CategoryChart
+        expenses={expenses.filter(
+          (expense) => expense.category !== 'תוספת תקציב'
+        )} // Excludes budget additions from chart
+        categories={categories}
+      />
       <ExpenseList
         expenses={expenses}
         onDeleteExpense={deleteExpense}
